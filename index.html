@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>教会AI数据底盘点</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap">
+<style>
+/* 布局：盘点账本。单栏，先结论与总表，再逐维度台账，最后是可交付物与附录 */
+:root {
+  --paper: #f3f6f8;
+  --surface: #ffffff;
+  --ink: #15202b;
+  --muted: #566370;
+  --line: #d6dee4;
+  --accent: #1d5c86;
+  --p1: #2b7a4b;
+  --p2: #a96d12;
+  --p3: #a1473a;
+  --font-display: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f151b; --surface: #161e26; --ink: #e3e9ef; --muted: #95a3b0;
+    --line: #2a3541; --accent: #74b1dc; --p1: #62c38f; --p2: #e2aa4f; --p3: #e5826f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f151b; --surface: #161e26; --ink: #e3e9ef; --muted: #95a3b0;
+  --line: #2a3541; --accent: #74b1dc; --p1: #62c38f; --p2: #e2aa4f; --p3: #e5826f;
+  color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.7; }
+.wrap { max-width: 940px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: flex; flex-direction: column; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.35; }
+h1 { font-size: 30px; }
+h2 { font-size: 21px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+h3 { font-size: 17px; }
+p { margin: 0; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; color: var(--accent); font-weight: 500; }
+.meta { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--font-mono); font-size: .92em; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 500; }
+a { color: var(--accent); }
+section { display: flex; flex-direction: column; gap: 16px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+
+.lead { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; max-width: 72ch; }
+.lead strong { color: var(--ink); }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.fact { border-top: 2px solid var(--accent); padding-top: 8px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fact .v { font-family: var(--font-mono); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.fact .k { font-size: 13px; color: var(--muted); }
+
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-weight: 500; color: var(--muted); font-size: 12px; letter-spacing: .04em; background: color-mix(in srgb, var(--paper) 60%, var(--surface)); }
+tr:last-child td { border-bottom: 0; }
+td.dim { font-weight: 700; white-space: nowrap; }
+
+.chip { display: inline-block; font-family: var(--font-mono); font-size: 12px; font-weight: 500; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.chip.p1 { color: var(--p1); background: color-mix(in srgb, var(--p1) 10%, transparent); }
+.chip.p2 { color: var(--p2); background: color-mix(in srgb, var(--p2) 12%, transparent); }
+.chip.p3 { color: var(--p3); background: color-mix(in srgb, var(--p3) 10%, transparent); }
+
+.entry { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.entry-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.entry-head .ask { color: var(--muted); font-size: 13px; flex-basis: 100%; }
+dl { display: grid; grid-template-columns: 7.5em 1fr; gap: 8px 16px; margin: 0; }
+dt { color: var(--muted); font-size: 13px; padding-top: 2px; }
+dd { margin: 0; min-width: 0; }
+dd ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; }
+.verdict { border-left: 3px solid var(--accent); padding-left: 12px; }
+
+.give { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.give > div { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.give ul, .plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 18px; }
+summary { cursor: pointer; font-weight: 500; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details[open] summary { margin-bottom: 10px; }
+.foot { color: var(--muted); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+
+@media (max-width: 560px) {
+  .wrap { padding-inline: 16px; padding-block: 28px 56px; gap: 36px; }
+  h1 { font-size: 25px; }
+  dl { grid-template-columns: 1fr; gap: 2px; }
+  dd { margin-bottom: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI 项目平台 · 后台数据盘点</div>
+  <h1>「教会 AI」贡献说明：平台后台能提供哪些数据</h1>
+  <p class="meta">盘点对象：AI 项目平台（<a href="https://ai-native-pm-platform.ndhy.com" target="_blank" rel="noopener">ai-native-pm-platform.ndhy.com</a>）。数字为 2026-10-14 对生产库只读统计的结果，只含计数，不含个人明细。P1 = 后台自动关联；P2 = 后台预填、同学确认补充；P3 = 平台内没有数据，需要同学手填或接其他系统。</p>
+</header>
+
+<section>
+  <h2>结论</h2>
+  <div class="lead">
+    <p><strong>没有一个维度能做到 P1。</strong>平台能按人预填的只有【判】和【教】两项（P2），数据来自同学在平台上处理 AI 产出确认单时留下的决定和修改意见。其余维度在平台内要么没有记录，要么记录的是项目或系统，落不到具体同学，按 P3 处理。</p>
+    <p><strong>平台覆盖的人很少。</strong>9 月 22 日以来在平台上有操作的只有 56 人，有效数据从 2026 年 9 月中下旬才开始积累。对「全员非游」来说，绝大多数同学在本平台没有记录，只能走 P3。</p>
+    <p><strong>没有现成的导出。</strong>平台没有按人、按周期的报表或导出功能，相关页面在生产上大多只对管理员开放。每个统计周期需要由平台侧跑一次只读统计，导出一份按人的预填表。</p>
+  </div>
+  <div class="facts">
+    <div class="fact"><span class="v">56 人</span><span class="k">9 月 22 日以来在平台有操作的同学（此前没有访问记录）</span></div>
+    <div class="fact"><span class="v">376</span><span class="k">平台成员记录，其中 240 条是旧官网迁移的占位号</span></div>
+    <div class="fact"><span class="v">9 月中下旬</span><span class="k">大部分业务数据的起点，9 月 22 日前后做过一次清理</span></div>
+    <div class="fact"><span class="v">无</span><span class="k">部门 / 中心字段，按中心统计需要拿 HR 名单关联</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>逐维度总表</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>维度</th><th>结论</th><th>平台里有什么</th><th>能否落到人</th><th>生产现有数据量</th></tr></thead>
+      <tbody>
+        <tr><td class="dim">交付成果与验收质量</td><td><span class="chip p3">P3</span><br><span class="meta">主创可得少量预填</span></td><td>项目目标、事务、AI 验收评级、立项构想</td><td>机制有，数据稀薄</td><td>事务 <span class="num">40</span> 条，完成 <span class="num">1</span> 条；能按人的验收评级几乎为 0</td></tr>
+        <tr><td class="dim">【判】专家把控</td><td><span class="chip p2">P2</span></td><td>AI 产出确认单上的决定、退回、修改意见</td><td>能，到 UC 用户 id</td><td>已决定单据 <span class="num">136</span> 张 / <span class="num">20</span> 人；修改意见 <span class="num">103</span> 条 / <span class="num">11</span> 人</td></tr>
+        <tr><td class="dim">【教】赋能建议与成果转化</td><td><span class="chip p2">P2</span><br><span class="meta">提升说明需手填</span></td><td>意见 → AI 改版 → 确认；AI 提炼项目规则；Skill 改版</td><td>意见能到人，改版要回溯</td><td>AI 按意见改出 <span class="num">276</span> 个版本；意见分析池 <span class="num">0</span> 条</td></tr>
+        <tr><td class="dim">【沉】AI 资产沉淀</td><td><span class="chip p3">P3</span></td><td>经验资产库、Skill 库、AI 员工目录</td><td>记的是批准人或系统</td><td>经验资产 <span class="num">17</span> 条，同学手工录入 <span class="num">1</span> 条</td></tr>
+        <tr><td class="dim">【变】规则优化（多快好省）</td><td><span class="chip p3">P3</span></td><td>规则治理、管理标准、平台改造建议、算力费用</td><td>多为系统记录</td><td>候选规则 <span class="num">13</span> 条均记为系统；改造建议 <span class="num">7</span> 条无提出人</td></tr>
+        <tr><td class="dim">【拦截项】数据安全合规</td><td><span class="chip p3">P3</span></td><td>代码里有安全回执结构，未接入运行</td><td>不能</td><td>安全回执 <span class="num">0</span>、事故单 <span class="num">0</span></td></tr>
+        <tr><td class="dim">流程与生产线贡献</td><td><span class="chip p3">P3</span></td><td>发布更新履历、Skill / AI 员工版本记录</td><td>不能，只到平台</td><td>发布履历 <span class="num">146</span> 条；AI 员工迭代需求 <span class="num">0</span> 条</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>逐维度说明</h2>
+
+  <article class="entry">
+    <div class="entry-head"><h3>交付成果与验收质量</h3><span class="chip p3">P3</span><span class="ask">需求：周期内通过 AI 为实际业务 / 项目带来的落地成效</span></div>
+    <dl>
+      <dt>平台里有</dt><dd>项目的核心价值、中短期目标、阶段目标；事务及 AI 执行记录；AI 验收给出的 8 档评级；目标月度验收；同学提交的立项构想及其产出的项目。</dd>
+      <dt>生产现状</dt><dd><ul>
+        <li>平台共 <span class="num">157</span> 个项目。事务从 10 月 9 日才开始在平台内落地，目前只有 <span class="num">40</span> 条，<span class="num">1</span> 条完成，<span class="num">1</span> 条有认领人。</li>
+        <li>阶段验收 <span class="num">156</span> 条中有 <span class="num">154</span> 条是「到期但名下没有事务，按 0 分结清」，目标月度验收 <span class="num">102</span> 条全部未通过。这些数据说明平台内还没有成果积累，不能当作同学的成效。</li>
+        <li>能按人用的是项目名册：<span class="num">49</span> 位同学是 <span class="num">156</span> 个项目的项目主创，<span class="num">14</span> 位同学是目标负责人。</li>
+        <li>立项构想：同学手工提交 <span class="num">15</span> 条（<span class="num">7</span> 人），其中 <span class="num">4</span> 条已由 AI 流水线产出正式项目。</li>
+      </ul></dd>
+      <dt>查看渠道</dt><dd>个人工作台「我承接的目标」「我的事务」（本人看本人）；项目工作台「目标树」。「验收与闭环」「执行事务池」菜单在生产只对管理员和分管领导开放。</dd>
+      <dt>更新方式</dt><dd>业务动作发生时实时写入；AI 自动验收每 10 分钟一轮；目标月度验收每天 01:05。项目周报（含「本周我的贡献」）的推送在生产处于关闭状态。</dd>
+      <dt>建议</dt><dd class="verdict">按需求方的方案一走：平台可预填「你是哪些项目的主创 / 哪些目标的负责人、这些项目的核心目标是什么」，由同学确认并说明自己负责的部分。同学日常事务大部分仍在旧官网事务池，事务成效要问旧系统。正在开发的「AI 项目负责人」评级（进度、难度、价值、质量合成）尚未上线，上线后可作为这一维度的数据源。</dd>
+    </dl>
+  </article>
+
+  <article class="entry">
+    <div class="entry-head"><h3>【判】AI 产出后的专家把控</h3><span class="chip p2">P2</span><span class="ask">需求：周期内有效判断「AI 生成」的产出问题并及时拦截</span></div>
+    <dl>
+      <dt>平台里有</dt><dd>AI 起草的目标与验收标准、事务分组、立项评估、流程卡点等都会生成确认单，由同学决定通过、退回或修改，并可逐条采纳或退回 AI 候选、写修改意见。每条决定都记录了处理人和时间。</dd>
+      <dt>生产现状</dt><dd><ul>
+        <li>已决定单据 <span class="num">136</span> 张，<span class="num">20</span> 位同学，处理人全部能对上平台成员。</li>
+        <li>单据修改意见 <span class="num">103</span> 条，<span class="num">11</span> 位同学，涉及 <span class="num">22</span> 张单据。</li>
+        <li>AI 起草的目标候选：同学逐条采纳 <span class="num">85</span> 次、退回修改 <span class="num">68</span> 次。</li>
+        <li>明确推翻 AI 判断的决定：坚持立项（AI 评估未达标）<span class="num">3</span> 张，流程卡点改方向或驳回 <span class="num">5</span> 张。</li>
+      </ul></dd>
+      <dt>缺口</dt><dd>平台没有统一的「拦截了 AI 问题」标记，需要按单据类型约定哪些决定算拦截（例如退回、修改、驳回、改方向），且同一个决定值在不同单据里含义可能不同。拦截了什么问题、避免了什么后果，只有自由文本，需要同学补充。平台没有「自省工具」，价值观对齐页面尚未开放。</dd>
+      <dt>查看渠道</dt><dd>个人工作台「等我决策」，同学可查看自己处理过的单据。管理视角没有汇总页面，需要导出。</dd>
+      <dt>更新方式</dt><dd>同学点击决定时实时写入。</dd>
+      <dt>建议</dt><dd class="verdict">按人预填：「周期内你处理了 N 张 AI 产出确认单，其中退回 / 修改 M 次，写了 K 条修改意见」，由同学补充每次拦截的具体问题。</dd>
+    </dl>
+  </article>
+
+  <article class="entry">
+    <div class="entry-head"><h3>【教】AI 赋能建议与成果转化</h3><span class="chip p2">P2</span><span class="ask">需求：周期内对 AI 的赋能建议，以及调整后「AI 生成」结果的提升</span></div>
+    <dl>
+      <dt>平台里有</dt><dd>同学在确认单上提修改意见后，AI 按意见重写并留下各版本；AI 会把意见提炼成项目规则，或归入平台诉求池；另有 Skill 改版流程（提修改、审批、生效新版本）。</dd>
+      <dt>生产现状</dt><dd><ul>
+        <li>AI 按意见改出 <span class="num">276</span> 个版本（<span class="num">36</span> 张单据）；有意见的单据中 <span class="num">7</span> 张已最终确认。</li>
+        <li>AI 从意见中提炼并生效的项目规则 <span class="num">15</span> 条；进入平台诉求池的意见 <span class="num">45</span> 条，可回溯到 <span class="num">6</span> 位同学。</li>
+        <li>Skill 改版：<span class="num">5</span> 个案例、<span class="num">4</span> 个新版本生效，改稿和审批各 <span class="num">1</span> 人（另有 1 个操作标识无法确认是否为真人），集中在平台维护者。</li>
+        <li>意见分析池（异步反馈统一入口）<span class="num">0</span> 条，生产上没有用起来。</li>
+      </ul></dd>
+      <dt>缺口</dt><dd>「调整后提升了多少」平台没有存数值。Skill 效果评估只在打开页面时临时计算，只到 Skill 版本，不到人，生产也几乎没有可对比的版本。</dd>
+      <dt>查看渠道</dt><dd>个人工作台「等我决策」中的单据详情可看修订历史。意见分析池、Skill 维护工作台在生产只对管理员开放。</dd>
+      <dt>更新方式</dt><dd>意见与改版实时写入；意见归类和提炼由后台作业异步完成，通常在分钟级。</dd>
+      <dt>建议</dt><dd class="verdict">按人预填：「你提了 K 条意见，AI 据此改了 R 版，J 张单据最终确认，沉淀出 X 条项目规则」。提升说明由同学填写。</dd>
+    </dl>
+  </article>
+
+  <article class="entry">
+    <div class="entry-head"><h3>【沉】AI 资产沉淀（含 Skill、Agent 等资产）</h3><span class="chip p3">P3</span><span class="ask">需求：周期内沉淀的 AI 资产说明（附存储地址）</span></div>
+    <dl>
+      <dt>平台里有</dt><dd>经验资产库（结项经验、专家知识、决策规则）、Skill 库（<span class="num">100</span> 个 Skill）、AI 员工目录（<span class="num">90</span> 个 AI 员工）、项目记忆、AI 交付物归档。</dd>
+      <dt>生产现状</dt><dd><ul>
+        <li>经验资产 <span class="num">17</span> 条，同学手工录入的只有 <span class="num">1</span> 条（7 月录入，已退役）。</li>
+        <li>Skill 共 <span class="num">395</span> 个版本，<span class="num">386</span> 个由平台发布时从代码仓库导入，作者不进库。</li>
+        <li>AI 员工 <span class="num">90</span> 个、<span class="num">1028</span> 个版本，全部由系统脚本写入。</li>
+      </ul></dd>
+      <dt>缺口</dt><dd>资产记录的是批准人、管理员或系统，不是贡献者。经验资产没有「存储地址」字段，只有平台内链接。各中心的 AI 资产库不在本平台。</dd>
+      <dt>查看渠道</dt><dd>经验资产库（生产菜单名「知识库」）只对管理员和项目主创开放；Skill 维护工作台只对管理员开放。</dd>
+      <dt>建议</dt><dd class="verdict">按需求方原方案，以各中心 AI 资产库为准，由同学确认并补充存储地址。本平台的 Skill、AI 员工主要由平台建设团队维护，不适合作为全员的沉淀数据。</dd>
+    </dl>
+  </article>
+
+  <article class="entry">
+    <div class="entry-head"><h3>【变】基于 AI 能力的规则优化（多快好省）</h3><span class="chip p3">P3</span><span class="ask">需求：基于多快好省的逻辑，对 AI 规则贡献进行补充</span></div>
+    <dl>
+      <dt>平台里有</dt><dd>规则治理（AI 从人工裁定中提炼候选规则）、项目规则、管理标准、平台改造建议、算力费用、事务逾期提醒、AI 验收给出的单条事务省时率。</dd>
+      <dt>生产现状</dt><dd><ul>
+        <li>AI 从人工裁定中提炼的候选规则 <span class="num">13</span> 条，提出人都记为系统；<span class="num">11</span> 条待确认，<span class="num">1</span> 条已生效。</li>
+        <li>管理标准修订批准 <span class="num">3</span> 次，审批人 <span class="num">1</span> 人；平台改造建议 <span class="num">7</span> 条，全部未关闭，也没有提出人。</li>
+        <li>近 90 天 AI 调用约 <span class="num">27.8</span> 万次，只能按项目统计费用，且 <span class="num">88.8%</span> 的调用没有挂到项目上；没有任何按人的数据。</li>
+        <li>平台没有「节约了多少」的口径，只有「花了多少」。</li>
+      </ul></dd>
+      <dt>建议</dt><dd class="verdict">由同学手填，必要时附发布履历或规则链接作为佐证。</dd>
+    </dl>
+  </article>
+
+  <article class="entry">
+    <div class="entry-head"><h3>【拦截项】AI 数据安全合规</h3><span class="chip p3">P3</span><span class="ask">需求：自动关联周期内 AI 产出的数据安全问题</span></div>
+    <dl>
+      <dt>平台里有</dt><dd>代码里有数据外发扫描回执、事故冻结单的结构，但没有接入实际运行链路。AI 调用日志只记录调用和项目，不记录是谁触发的。</dd>
+      <dt>生产现状</dt><dd>安全扫描回执 <span class="num">0</span> 条、事故单 <span class="num">0</span> 条。抽查近 1 天 <span class="num">5305</span> 次 AI 调用，内容安全拦截 <span class="num">0</span> 次；近 90 天失败调用中与内容安全相关的 <span class="num">1</span> 条。</dd>
+      <dt>建议</dt><dd class="verdict">平台无法提供按人、按周期的安全问题数据。自动关联需要接公司安全 / 审计系统；否则由安全部门或同学填报。</dd>
+    </dl>
+  </article>
+
+  <article class="entry">
+    <div class="entry-head"><h3>流程与生产线贡献</h3><span class="chip p3">P3</span><span class="ask">需求：有没有 AI 工具 / 生产线新增、迭代的表单能直接关联</span></div>
+    <dl>
+      <dt>平台里有</dt><dd>发布更新履历（按天自动生成，记录平台改了什么）、Skill 与 AI 员工的版本记录、发给 6699 AI 员工平台的迭代需求单。</dd>
+      <dt>生产现状</dt><dd>发布履历 <span class="num">146</span> 条（自 6 月中旬起），记录的是平台层面的变更，没有对应到贡献人；AI 员工迭代需求单 <span class="num">0</span> 条。</dd>
+      <dt>查看渠道</dt><dd>所有登录用户可在平台右上角「发布履历」查看。</dd>
+      <dt>建议</dt><dd class="verdict">本平台没有这类表单。AI 工具和生产线的新增、迭代建议向 6699 AI 员工平台或各中心生产线负责人了解。</dd>
+    </dl>
+  </article>
+</section>
+
+<section>
+  <h2>我们能给到的</h2>
+  <div class="give">
+    <div>
+      <h3>按人预填表（每周期一次）</h3>
+      <ul>
+        <li>【判】处理的 AI 产出确认单数、退回 / 修改次数、修改意见条数</li>
+        <li>【教】意见带来的 AI 改版数、最终确认单据数、提炼出的项目规则数</li>
+        <li>交付成果：担任主创的项目、负责的目标及其核心目标，供同学确认</li>
+        <li>立项构想提交数及已产出的正式项目</li>
+      </ul>
+      <p class="meta">以 UC 用户 id 为人员键。由平台侧在每个周期只读统计后导出。</p>
+    </div>
+    <div>
+      <h3>需要对方先确认</h3>
+      <ul>
+        <li>统计周期的起止日期（平台数据最早只到 9 月中下旬）</li>
+        <li>全员名单及其 UC 用户 id 或工号，用于关联中心和补齐不在平台上的同学；平台把 UC 用户 id 当作工号使用，但两者是否一致还没有用 HR 名单核对</li>
+        <li>哪些单据决定算「拦截 AI 问题」的口径</li>
+      </ul>
+    </div>
+    <div>
+      <h3>需要其他系统提供</h3>
+      <ul>
+        <li>事务成效：旧官网事务池</li>
+        <li>AI 工具 / 生产线、Skill、Agent 资产：6699 AI 员工平台、各中心 AI 资产库</li>
+        <li>数据安全问题：公司安全 / 审计系统</li>
+      </ul>
+    </div>
+  </div>
+  <p class="meta">如果需要每个周期自动出数，可以在平台上做一个按人、按周期的导出，需要另行排期。</p>
+</section>
+
+<section>
+  <h2>相关页面</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>页面</th><th>路径</th><th>生产上谁能看到</th><th>对应维度</th></tr></thead>
+      <tbody>
+        <tr><td>个人工作台 · 等我决策</td><td class="mono">/me/decisions</td><td>所有登录用户，只看本人</td><td>判、教</td></tr>
+        <tr><td>个人工作台 · 我承接的目标 / 我的事务</td><td class="mono">/me/goals · /me/tasks</td><td>所有登录用户，只看本人</td><td>交付成果</td></tr>
+        <tr><td>立项构想</td><td class="mono">/mgr-intent</td><td>管理员、分管领导、项目集负责人、项目主创</td><td>交付成果</td></tr>
+        <tr><td>知识库（经验资产库）</td><td class="mono">/knowledge</td><td>管理员、项目主创</td><td>沉、变</td></tr>
+        <tr><td>意见分析池</td><td class="mono">/opinion</td><td>仅管理员</td><td>教</td></tr>
+        <tr><td>Skill 维护工作台</td><td class="mono">/ai-staff</td><td>仅管理员</td><td>沉、教</td></tr>
+        <tr><td>算力总看板</td><td class="mono">/cost-board</td><td>管理员、分管领导</td><td>变（费用）</td></tr>
+        <tr><td>发布履历</td><td>右上角入口</td><td>所有登录用户</td><td>流程与生产线</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="meta">访问地址：https://ai-native-pm-platform.ndhy.com ，使用公司 UC 账号登录。页面上没有按人汇总和导出功能。</p>
+</section>
+
+<details>
+  <summary>附录：技术口径（给开发同学）</summary>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>用途</th><th>表</th><th>人员字段</th></tr></thead>
+      <tbody>
+        <tr><td>人员身份</td><td class="mono">permission_members</td><td class="mono">id（UC 用户 id；无部门、无工号副本）</td></tr>
+        <tr><td>项目名册</td><td class="mono">permission_member_identities</td><td class="mono">member_id + role_id（lead 主创 / owner 项目集负责人）</td></tr>
+        <tr><td>判：单据决定</td><td class="mono">intervention_cards</td><td class="mono">decided_by_id、claimed_by_id；decision</td></tr>
+        <tr><td>判：流程节点</td><td class="mono">intervention_card_nodes</td><td class="mono">completed_by_id</td></tr>
+        <tr><td>判 / 教：修改意见</td><td class="mono">intervention_cards.source_ref → feedback[]、goal_reviews[]</td><td class="mono">actor_id（JSON 内）</td></tr>
+        <tr><td>教：AI 改版</td><td class="mono">goal_confirmation_revisions</td><td>无，经 card_id 回溯</td></tr>
+        <tr><td>教：项目规则 / 诉求池</td><td class="mono">project_memory · feedback_pool</td><td>无，经 card_id + feedback_key 回溯</td></tr>
+        <tr><td>教：Skill 改版</td><td class="mono">skill_evolution_proposal_revisions / _decisions</td><td class="mono">actor_id</td></tr>
+        <tr><td>交付成果</td><td class="mono">task · acceptance_record · goal_nodes · goal_node_owners · manager_intent_records</td><td class="mono">claimed_by_id、dispatch_owner_ids、member_id、submitted_by</td></tr>
+        <tr><td>沉</td><td class="mono">experience_assets · skills · skill_versions · ai_employees</td><td class="mono">created_by / confirmed_by（混存姓名、id、system）</td></tr>
+        <tr><td>变</td><td class="mono">experience_assets(kind=rule) · platform_improvement_suggestions · compute_call_log</td><td>基本无</td></tr>
+        <tr><td>安全</td><td class="mono">evaluation_asset_control_projections · incident_* · compute_call_log</td><td>无</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="meta" style="margin-top:10px">时区注意：单据 JSON 内的时间是 UTC 字符串，表字段时间是北京时间，按周期切数需要统一。生产运行版本 8e0b7c698，代码盘点基线 main 39b256e29。</p>
+</details>
+
+<div class="foot">
+  <p>统计时间：2026-10-14（北京时间）。数字来自生产库只读聚合查询，不含任何个人明细。</p>
+</div>
+</div>
+</body>
+</html>
